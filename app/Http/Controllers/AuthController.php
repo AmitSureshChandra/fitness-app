@@ -20,7 +20,7 @@ class AuthController extends Controller
             "name" => $fields["name"],
             "email" =>
             $fields["email"],
-            "password" => $fields["password"],
+            "password" => Hash::make($fields["password"]),
         ]);
 
         $token = $user->createToken("myapptoken")->plainTextToken;
@@ -44,7 +44,7 @@ class AuthController extends Controller
 
         $user = User::where("email", $fields["email"])->first();
 
-        if (!$user && Hash::check($fields["password"], $user->password)) {
+        if (!$user || !Hash::check($fields["password"], $user->password)) {
             return response([
                 "message" => "Bad Credential"
             ], 401);
