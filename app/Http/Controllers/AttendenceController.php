@@ -27,16 +27,6 @@ class AttendenceController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -48,6 +38,21 @@ class AttendenceController extends Controller
         $request->validate([
             'action' => 'required'
         ]);
+
+        if (!in_array($request->action, ["IN", "OUT"])) {
+            return response([
+                "message" => "action can be either 'IN' or 'OUT'"
+            ], 422);
+        }
+
+        if (
+            $request->action == "OUT" &&
+            is_null(Attendence::whereAction("IN")->whereUserId(auth()->user()->id)->where("date", "LIKE", Carbon::now()->format("Y-m-d"))->first())
+        ) {
+            return response([
+                "message" => "IN action not exist"
+            ], 422);
+        }
 
         $attendence = new Attendence;
         $attendence->user_id = auth()->user()->id;
@@ -69,42 +74,8 @@ class AttendenceController extends Controller
      * @param  \App\Models\Attendence  $attendence
      * @return \Illuminate\Http\Response
      */
-    public function show(Attendence $attendence)
+    public function get(int $id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Attendence  $attendence
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Attendence $attendence)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Attendence  $attendence
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Attendence $attendence)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Attendence  $attendence
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Attendence $attendence)
-    {
-        //
+        return Attendence::whereUserId(auth()->user()->id)->whereId($id)->first();
     }
 }

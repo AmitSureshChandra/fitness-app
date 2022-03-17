@@ -22,14 +22,14 @@ class AuthController extends Controller
     {
         $fields = $request->validate([
             "name" => "required|string",
-            "email" => "required|string|unique:users,email",
+            "email" => "required|string|unique:users,email|email",
             "password" => "required|string",
             "role" => "required|string"
         ]);
 
         $user = $this->userRepo->create($fields);
 
-        $token = $user->createToken("myapptoken")->plainTextToken;
+        $token = $user->createToken("fitness_app")->plainTextToken;
 
         $response = [
             "user" => $user,

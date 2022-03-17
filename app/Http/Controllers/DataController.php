@@ -27,14 +27,14 @@ class DataController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            "neck" => "required",
-            "shoulder" => "required",
-            "chest" => "required",
-            "arms" => "required",
-            "forearms" => "required",
-            "thighs" => "required",
-            "calf" => "required",
-            "weight" => "required",
+            "neck" => "required|integer",
+            "shoulder" => "required|integer",
+            "chest" => "required|integer",
+            "arms" => "required|integer",
+            "forearms" => "required|integer",
+            "thighs" => "required|integer",
+            "calf" => "required|integer",
+            "weight" => "required|integer",
         ]);
 
         $data = new Data;
@@ -64,6 +64,6 @@ class DataController extends Controller
      */
     public function get(int $id)
     {
-        return Data::find($id);
+        return Data::whereUserId(auth()->user()->id)->orderBy("date")->whereId($id)->first();
     }
 }
