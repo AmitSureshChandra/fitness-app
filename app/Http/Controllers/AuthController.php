@@ -2,26 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Http\Repository\UserRepo;
+use App\Http\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    protected UserService $userService;
+    protected UserRepo $userRepo;
+
+    public function __construct(UserService $userService, UserRepo $userRepo)
+    {
+        $this->userService = $userService;
+        $this->userRepo = $userRepo;
+    }
+
     public function register(Request $request)
     {
         $fields = $request->validate([
             "name" => "required|string",
             "email" => "required|string|unique:users,email",
-            "password" => "required|string"
+            "password" => "required|string",
+            "role" => "required|string"
         ]);
 
-        $user = User::create([
-            "name" => $fields["name"],
-            "email" =>
-            $fields["email"],
-            "password" => Hash::make($fields["password"]),
-        ]);
+        $user = $this->userRepo->create($fields);
 
         $token = $user->createToken("myapptoken")->plainTextToken;
 
@@ -42,7 +48,7 @@ class AuthController extends Controller
 
         // check email & password 
 
-        $user = User::where("email", $fields["email"])->first();
+        $user = $this->userRepo->findByEmail($fields["email"]);
 
         if (!$user || !Hash::check($fields["password"], $user->password)) {
             return response([
@@ -64,6 +70,14 @@ class AuthController extends Controller
     {
         auth()->user()->tokens()->delete();
 
-        return "logout";
+        return response([
+            "message" => "logout"
+        ], 200);
+    }
+
+    public function createToken(Request $request)
+    {
+        $token = $request->user()->createToken($request->token_name);
+        return ['token' => $token->plainTextToken];
     }
 }

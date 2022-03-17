@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AttendenceController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DataController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,18 +20,29 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::group(["middleware" => ["auth:sanctum"]], function () {
-    Route::post('/tokens/create', function (Request $request) {
-        $token = $request->user()->createToken($request->token_name);
-        return ['token' => $token->plainTextToken];
-    });
 
-
+    // Auth API
+    Route::post('/tokens/create', [AuthController::class, "createToken"]);
 
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
 
     Route::post('/logout', [AuthController::class, "logout"]);
+
+
+    // Attendence API
+    Route::post('/attendence', [AttendenceController::class, "store"]);
+
+    Route::get('/attendence', [AttendenceController::class, "index"]);
+
+    // Data Store API
+
+    Route::post('/data', [DataController::class, "store"]);
+
+    Route::get('/data', [DataController::class, "index"]);
+
+    Route::get('/data/{id}', [DataController::class, "show"]);
 });
 
 Route::post("/register", [AuthController::class, "register"]);
