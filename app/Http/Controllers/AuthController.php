@@ -50,6 +50,14 @@ class AuthController extends Controller
 
         $user = $this->userRepo->findByEmail($fields["email"]);
 
+
+        if($request->has("type") && $request->type == "admin" && $user &&  $user->role->name !== config("constants.roles")["admin"]){
+           return response([
+               "message" => "unauthorized"
+           ], 401);
+        }
+
+        
         if (!$user || !Hash::check($fields["password"], $user->password)) {
             return response([
                 "message" => "Bad Credential"
@@ -63,7 +71,7 @@ class AuthController extends Controller
             "token" => $token
         ];
 
-        return response($response, 201);
+        return response($response, 200);
     }
 
     public function logout()
