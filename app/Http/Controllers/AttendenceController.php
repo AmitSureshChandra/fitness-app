@@ -23,7 +23,7 @@ class AttendenceController extends Controller
             $query->where("date", "LIKE", "%$request->date%");
         }
 
-        return $query->orderBy("created_at")->paginate(10);
+        return $query->orderBy("created_at", "DESC")->paginate(10);
     }
 
     /**

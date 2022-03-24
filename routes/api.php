@@ -33,11 +33,11 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
 
 
     // Attendence API
-    Route::post('/attendence', [AttendenceController::class, "store"]);
+    Route::post('/attendences', [AttendenceController::class, "store"]);
 
-    Route::get('/attendence', [AttendenceController::class, "index"]);
+    Route::get('/attendences', [AttendenceController::class, "index"]);
 
-    Route::get('/attendence/{id}', [AttendenceController::class, "get"]);
+    Route::get('/attendences/{id}', [AttendenceController::class, "get"]);
 
 
     // Data Store API
